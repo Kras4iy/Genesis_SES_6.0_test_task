@@ -1,0 +1,1 @@
+export type SubscribeData = { email: string; repo: string };

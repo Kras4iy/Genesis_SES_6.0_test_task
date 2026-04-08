@@ -1,0 +1,26 @@
+import { CONFIG } from "./config";
+import ThrowErrorCode from "./utils/throwErrorCode";
+
+export const ghGetRepoInfo = async (repo: string): Promise<string | undefined> => {
+  try {
+    const headers = new Headers();
+    if (CONFIG.GHP_TOKEN) {
+      headers.append('Authorization', `token ${CONFIG.GHP_TOKEN}`);
+    }
+    const response = await fetch(`https://api.github.com/repos/${repo}/releases`, { headers });
+    const data = await response.json();
+    if (!response.ok) {
+      if (data.message === 'Not Found' && response.status === 404) {
+        throw new ThrowErrorCode(404, `Repository ${repo} not found`);
+      }
+      if (data.message.includes('API rate limit exceeded') && response.status === 403) {
+        throw new ThrowErrorCode(429,`GitHub API rate limit exceeded. Please try again later.`);
+      }
+      throw new Error(`GitHub API error: ${response.statusText}, data: ${JSON.stringify(data)}`);
+    }
+    return data.length > 0 ? data[0].published_at : undefined;
+  } catch (error) {
+    console.error('Error fetching repository information:', error);
+    throw error;
+  }
+}

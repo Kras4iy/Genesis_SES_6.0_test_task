@@ -1,5 +1,5 @@
 import moment from "moment";
-import { ghGetRepoInfo } from "../api";
+import { ghGetRepoReleasesInfo } from "../api";
 import { CONFIG } from "../config";
 import { prisma } from "../lib/prisma";
 import ThrowErrorCode from "./throwErrorCode";
@@ -29,13 +29,6 @@ const chunkArray = <T>(array: T[], chunkSize: number): T[][] => {
 };
 
 const handleNotFoundRepo = async (repo: string) => {
-  await prisma.activationTokens.deleteMany({
-    where: {
-      subscription: {
-        repoFullName: repo,
-      }
-    }
-  });
   await prisma.subscription.deleteMany({
     where: {
       repoFullName: repo,
@@ -95,7 +88,7 @@ const scanner = async () => {
       const chunk = chunkedQueue[i];
       await Promise.allSettled(chunk.map(async (repo) => {
         try {
-          const data = await ghGetRepoInfo(repo);
+          const data = await ghGetRepoReleasesInfo(repo);
           await handleUpdateLastSeenTag(repo, data);
 
         } catch (err) {
@@ -136,7 +129,7 @@ const startScanner = () => {
       setTimeout(execute, CONFIG.SCANNER_INTERVAL);
     }
   }
-  // execute();
+  execute();
 }
 
 export default startScanner;

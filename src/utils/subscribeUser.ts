@@ -3,11 +3,11 @@ import { sendActivationEmail } from '../utils/sendEmail';
 import { SubscribeData } from '../types';
 import crypto from 'crypto';
 import ThrowErrorCode from '../utils/throwErrorCode';
-import { ghGetRepoInfo } from '../api';
+import { ghGetRepoReleasesInfo } from '../api';
 import moment from 'moment';
 
 export default async function subscribeUser(data: SubscribeData) {
-  const lastPushedTime = await ghGetRepoInfo(data.repo).catch((err) => {
+  const lastPushedTime = await ghGetRepoReleasesInfo(data.repo).catch((err) => {
     if (err instanceof ThrowErrorCode && err.code !== 429) {
       throw err;
     } else {
@@ -68,7 +68,7 @@ export default async function subscribeUser(data: SubscribeData) {
     }
   });
 
-  await sendActivationEmail(existingUser.email, activationToken.token);
+  await sendActivationEmail(existingUser.email, activationToken.token, data.repo);
 
   return subscription;
 }

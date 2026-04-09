@@ -6,7 +6,8 @@ import { CONFIG } from './config';
 import ThrowErrorCode from './utils/throwErrorCode';
 import activateSubscription from './utils/activateSubscription';
 import startScanner from './utils/scanner';
-import { sendNotificationEmail } from './utils/sendEmail';
+import deactivateSubscription from './utils/deactivateSubscription';
+import getAllUserSubscription from './utils/getAllUserSubscription';
 
 const server: FastifyInstance = Fastify({})
 
@@ -45,9 +46,43 @@ server.post('/subscribe', async (request, reply) => {
   }
 });
 
+server.get('/unsubscribe/:token', async (request, reply) => {
+  try {
+    const { token } = request.params as { token?: string };
+    if (token) {
+      await deactivateSubscription(token);
+    } else {
+      throw new ThrowErrorCode(400, 'Token is required');
+    }
+    return reply.code(200).send('Unsubscribed successfully');
+  } catch (err) {
+    if (err instanceof ThrowErrorCode) {
+      return reply.code(err.code).send({ message: err.message });
+    }
+    console.error('Error in unsubscribe endpoint:', err);
+    return reply.code(500).send({ message: 'Internal Server Error' });
+  }
+})
+
+server.get('/subscriptions', async (request, reply) => {
+  try {
+    const { email } = request.query as { email?: string };
+    if (!email) {
+      throw new ThrowErrorCode(400, 'Email is required or it is invalid');
+    }
+    const subscriptions = await getAllUserSubscription(email);
+    return reply.code(200).send(subscriptions);
+  } catch (err) {
+    if (err instanceof ThrowErrorCode) {
+      return reply.code(err.code).send({ message: err.message });
+    }
+    console.error('Error in unsubscribe endpoint:', err);
+    return reply.code(500).send({ message: 'Internal Server Error' });
+  }
+})
+
 server.get('/confirm/:token', async (request, reply) => {
   try {
-    console.log('Confirm endpoint hit with token:', request.params);
     const { token } = request.params as { token?: string };
     if (token) {
       await activateSubscription(token);

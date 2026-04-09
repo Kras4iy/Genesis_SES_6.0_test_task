@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Activate Your Subscription</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    .email-container {
+      max-width: 600px;
+      margin: 20px auto;
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    .email-header {
+      background-color: #007BFF;
+      color: #ffffff;
+      text-align: center;
+      padding: 20px;
+    }
+    .email-header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .email-body {
+      padding: 20px;
+      color: #333333;
+      line-height: 1.6;
+    }
+    .email-body p {
+      margin: 0 0 10px;
+    }
+    .button {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #0073e6;
+      color: #fff !important;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+    .button:hover {
+      background-color: #0056b3;
+    }
+    a:visited {
+      color: #0073e6;
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <div class="email-header">
+      <h1>Activate Your Subscription to the [[repo.name]]</h1>
+    </div>
+    <div class="email-body">
+      <p>Thank you for subscribing to the <a href="[[repo.link]]">[[repo.name]]</a>! <br/> To start receiving notification about fresh releases, please activate your subscription by clicking the button below:</p>
+      <p style="text-align: center;">
+        <a href="[[activation.link]]" class="button">Activate Subscription</a>
+      </p>
+      <p>If you did not subscribe, please ignore this email.</p>
+    </div>
+  </div>
+</body>
+</html>

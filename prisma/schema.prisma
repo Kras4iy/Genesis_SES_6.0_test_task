@@ -25,12 +25,11 @@ model User {
 model Subscription {
   id            Int    @id @default(autoincrement())
   repoFullName  String @db.VarChar(255)
-  unsubscribeToken String @db.VarChar(255)
+  unsubscribeToken String @unique @db.VarChar(255)
   isActivated Boolean @default(false)
   lastSeenTag DateTime? @default(now())
   lastPushedTag DateTime?
   userId        Int
-  tokens ActivationTokens[]
   user User @relation(fields: [userId], references: [id])
 }
 
@@ -42,6 +41,4 @@ model ActivationTokens {
   isUsed Boolean? @default(false)
   isExpired Boolean? @default(false)
   isActivated Boolean? @default(false)
-
-  subscription Subscription @relation(fields: [subscriptionId], references: [id])
 }

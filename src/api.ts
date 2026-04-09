@@ -1,7 +1,7 @@
 import { CONFIG } from "./config";
 import ThrowErrorCode from "./utils/throwErrorCode";
 
-export const ghGetRepoInfo = async (repo: string): Promise<string | undefined> => {
+export const ghGetRepoReleasesInfo = async (repo: string): Promise<string | undefined> => {
   try {
     const headers = new Headers();
     if (CONFIG.GHP_TOKEN) {
@@ -18,7 +18,14 @@ export const ghGetRepoInfo = async (repo: string): Promise<string | undefined> =
       }
       throw new Error(`GitHub API error: ${response.statusText}, data: ${JSON.stringify(data)}`);
     }
-    return data.length > 0 ? data[0].published_at : undefined;
+    if (data.length) {
+      const latestRelease = data.reduce((latest: any, current: any) => {
+        return new Date(current.published_at) > new Date(latest.published_at) ? current : latest;
+      });
+      return latestRelease.published_at;
+    }
+    
+    return undefined
   } catch (error) {
     console.error('Error fetching repository information:', error);
     throw error;

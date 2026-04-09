@@ -1,4 +1,5 @@
 import { CONFIG } from "./config";
+import { getRepoLastRelease } from "./utils/getRepoLastRelease";
 import ThrowErrorCode from "./utils/throwErrorCode";
 
 export const ghGetRepoReleasesInfo = async (repo: string): Promise<string | undefined> => {
@@ -18,14 +19,7 @@ export const ghGetRepoReleasesInfo = async (repo: string): Promise<string | unde
       }
       throw new Error(`GitHub API error: ${response.statusText}, data: ${JSON.stringify(data)}`);
     }
-    if (data.length) {
-      const latestRelease = data.reduce((latest: any, current: any) => {
-        return new Date(current.published_at) > new Date(latest.published_at) ? current : latest;
-      });
-      return latestRelease.published_at;
-    }
-    
-    return undefined
+    return getRepoLastRelease(data);
   } catch (error) {
     console.error('Error fetching repository information:', error);
     throw error;

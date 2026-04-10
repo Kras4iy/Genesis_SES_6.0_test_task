@@ -2,6 +2,7 @@ import "dotenv/config";
 
 export const CONFIG = {
   PORT: process.env.PORT ? +process.env.PORT : 3000,
+  HOST: process.env.DOCKER_IMAGE === 'true' ? '0.0.0.0' : 'localhost',
   BASE_URL: process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}`,
   DATABASE_URL: process.env.DATABASE_URL,
   EMAIL_USER: process.env.EMAIL_USER,
@@ -11,3 +12,5 @@ export const CONFIG = {
   SCANNER_REPOS_CHUNK_SIZE: process.env.SCANNER_REPOS_CHUNK_SIZE ? +process.env.SCANNER_REPOS_CHUNK_SIZE : 5,
   EMAIL_SENDING_CHUNK_SIZE: process.env.EMAIL_SENDING_CHUNK_SIZE ? +process.env.EMAIL_SENDING_CHUNK_SIZE : 5
 }
+
+console.log('Configuration loaded:', CONFIG);

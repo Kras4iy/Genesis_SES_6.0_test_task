@@ -101,7 +101,7 @@ server.get('/confirm/:token', async (request, reply) => {
 
 const start = async () => {
   try {
-    await server.listen({ port: CONFIG.PORT })
+    await server.listen({ port: CONFIG.PORT, host: CONFIG.HOST })
     console.log(`Server is running at port :${CONFIG.PORT}`)
   } catch (err) {
     server.log.error(err)

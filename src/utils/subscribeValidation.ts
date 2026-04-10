@@ -1,7 +1,6 @@
-const subscribeValidation = (data: { email?: string | null, repo?: string | null }) => {
-  const defaultMessage = 'Invalid input: ';
-  const { email, repo } = data;
+const defaultMessage = 'Invalid input: ';
 
+export const validateEmail = (email: string) => {
   if (!email) {
     return { valid: false, message: defaultMessage + 'Email is required.' };
   }
@@ -13,6 +12,18 @@ const subscribeValidation = (data: { email?: string | null, repo?: string | null
 
   if (email.length > 255) {
     return { valid: false, message: defaultMessage + 'Email must be less than 255 characters.' };
+  }
+
+  return { valid: true };
+}
+
+const subscribeValidation = (data: { email?: string | null, repo?: string | null }) => {
+  const { email, repo } = data;
+
+  const emailValidation = validateEmail(email || '');
+  
+  if (!emailValidation.valid) {
+    return emailValidation;
   }
 
   if (!repo) {

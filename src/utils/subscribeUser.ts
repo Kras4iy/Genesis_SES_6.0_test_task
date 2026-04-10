@@ -64,7 +64,7 @@ export default async function subscribeUser(data: SubscribeData) {
     data: {
       token: crypto.createHash('sha256').update(crypto.randomUUID()).digest('hex'),
       subscriptionId: subscription.id,
-      ttl: moment().add(2, 'minutes').toDate(),
+      ttl: moment().add(5, 'minutes').toDate(),
     }
   });
 

@@ -1,3 +1,4 @@
+import moment from "moment";
 import { prisma } from "../lib/prisma";
 import ThrowErrorCode from "./throwErrorCode";
 
@@ -10,8 +11,18 @@ const activateSubscription = async (token: string) => {
     throw new ThrowErrorCode(404, 'Token not found');
   }
 
+  if (moment(activationToken.ttl).isBefore(moment()) && !activationToken.isExpired) {
+    await prisma.activationTokens.update({
+      where: { id: activationToken.id },
+      data: {
+        isExpired: true,
+      }
+    });
+    throw new ThrowErrorCode(400, 'Token Expired');
+  }
+
   if (activationToken.isExpired) {
-    throw new ThrowErrorCode(400, 'Invalid token');
+    throw new ThrowErrorCode(400, 'Token Expired');
   }
 
   await prisma.subscription.update({

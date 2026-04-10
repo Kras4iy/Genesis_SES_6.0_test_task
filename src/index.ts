@@ -1,5 +1,5 @@
 import Fastify, { FastifyInstance } from 'fastify'
-import subscribeValidation from './utils/subscribeValidation';
+import subscribeValidation, { validateEmail } from './utils/subscribeValidation';
 import { SubscribeData } from './types';
 import subscribeUser from './utils/subscribeUser';
 import { CONFIG } from './config';
@@ -67,7 +67,7 @@ server.get('/unsubscribe/:token', async (request, reply) => {
 server.get('/subscriptions', async (request, reply) => {
   try {
     const { email } = request.query as { email?: string };
-    if (!email) {
+    if (!email || !validateEmail(email).valid) {
       throw new ThrowErrorCode(400, 'Email is required or it is invalid');
     }
     const subscriptions = await getAllUserSubscription(email);

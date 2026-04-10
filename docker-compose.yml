@@ -20,4 +20,4 @@ services:
       - db
     ports:
       - "3000:3000"
-    command: sh -c "npx prisma migrate deploy && node dist/index.js"
+    command: sh -c "npx prisma migrate dev --name init  && node dist/index.js"

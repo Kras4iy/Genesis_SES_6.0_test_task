@@ -3,5 +3,6 @@ node_modules
 .env
 /dist
 .package-lock.json
+.pnpm-lock.yaml
 /src/generated/prisma
 /prisma/migrations

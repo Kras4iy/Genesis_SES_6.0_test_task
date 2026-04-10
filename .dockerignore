@@ -1,0 +1,9 @@
+node_modules
+dist
+src/generated/prisma
+.package-lock.json
+.pnpm-lock.yaml
+.prisma
+.vscode
+.git
+.idea

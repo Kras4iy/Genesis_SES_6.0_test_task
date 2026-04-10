@@ -1,6 +1,7 @@
 import moment from "moment";
 import { prisma } from "../lib/prisma";
 import ThrowErrorCode from "./throwErrorCode";
+import { sendSuccessActivationEmail } from "./sendEmail";
 
 const activateSubscription = async (token: string) => {
   const activationToken = await prisma.activationTokens.findUnique({
@@ -25,10 +26,19 @@ const activateSubscription = async (token: string) => {
     throw new ThrowErrorCode(400, 'Token Expired');
   }
 
-  await prisma.subscription.update({
+  const subscription = await prisma.subscription.update({
     where: { id: activationToken.subscriptionId },
     data: {
       isActivated: true,
+    },
+    select: {
+      user: {
+        select: {
+          email: true,
+        }
+      },
+      repoFullName: true,
+      unsubscribeToken: true,
     }
   });
 
@@ -47,6 +57,8 @@ const activateSubscription = async (token: string) => {
       isActivated: true,
     }
   })
+
+  await sendSuccessActivationEmail(subscription.user.email, subscription.repoFullName, subscription.unsubscribeToken);
 }
 
 export default activateSubscription;

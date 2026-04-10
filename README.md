@@ -27,6 +27,7 @@ If an error occurs during notification sending, it will be retried on the next s
 
 5. **Endpoints**: The service provides RESTful endpoints for subscribing, activating, unsubscribing, and listing user subscriptions.
 
+6. **Authentication**: You can enable API authentication using the `API_USE_AUTH` and `API_KEY` environment variables. When authentication is enabled, all requests must include an `Authorization` header with the following format: `token {your_token}`.
 
 # Prerequisites
 - Node.js 18+ / 20+

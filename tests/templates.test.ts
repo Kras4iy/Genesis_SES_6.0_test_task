@@ -27,3 +27,10 @@ test('newRelease template should have correct placeholders', () => {
   expect(placeholders.has('unsubscribe.link')).toBe(true);
   expect(placeholders.has('repo.link')).toBe(true);
 })
+
+test('newRelease template should have correct placeholders', () => {
+  const placeholders = getTemplate('confirmSubscription');
+  expect(placeholders.has('repo.name')).toBe(true);
+  expect(placeholders.has('unsubscribe.link')).toBe(true);
+  expect(placeholders.has('repo.link')).toBe(true);
+})

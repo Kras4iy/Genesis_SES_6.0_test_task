@@ -10,7 +10,9 @@ export const CONFIG = {
   GHP_TOKEN: process.env.GHP_TOKEN,
   SCANNER_INTERVAL: process.env.SCANNER_INTERVAL ? +process.env.SCANNER_INTERVAL : 60 * 1000, // milliseconds
   SCANNER_REPOS_CHUNK_SIZE: process.env.SCANNER_REPOS_CHUNK_SIZE ? +process.env.SCANNER_REPOS_CHUNK_SIZE : 5,
-  EMAIL_SENDING_CHUNK_SIZE: process.env.EMAIL_SENDING_CHUNK_SIZE ? +process.env.EMAIL_SENDING_CHUNK_SIZE : 5
+  EMAIL_SENDING_CHUNK_SIZE: process.env.EMAIL_SENDING_CHUNK_SIZE ? +process.env.EMAIL_SENDING_CHUNK_SIZE : 5,
+  API_KEY: process.env.API_KEY,
+  API_USE_AUTH: process.env.API_USE_AUTH === 'true',
 }
 
 console.log('Configuration loaded:', CONFIG);

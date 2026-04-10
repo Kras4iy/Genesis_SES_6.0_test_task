@@ -21,3 +21,5 @@ SCANNER_INTERVAL=60000 #milliseconds
 SCANNER_REPOS_CHUNK_SIZE=5 #number of repos to scan in one async operation
 EMAIL_SENDING_CHUNK_SIZE=5 #number of emails to send in one async operation
 DOCKER_IMAGE=false
+API_KEY="YOUR_API_KEY"
+API_USE_AUTH=false

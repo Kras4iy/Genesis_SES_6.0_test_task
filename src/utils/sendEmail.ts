@@ -19,6 +19,27 @@ const getTemplate = (templateName: string, variables: Record<string, string>): s
   });
 }
 
+export const sendSuccessActivationEmail = async (to: string, repo: string, unsubscribeToken: string) => {
+  let template: string;
+  try {
+    template = getTemplate('confirmSubscription', {
+      "repo.name": repo,
+      "unsubscribe.link": `${CONFIG.BASE_URL}/unsubscribe/${unsubscribeToken}`,
+      "repo.link": `https://github.com/${repo}/releases`
+    });
+  } catch (error) {
+    template = `Thanks for activating your subscription to ${repo}! To unsubscribe, click here: ${CONFIG.BASE_URL}/unsubscribe/${unsubscribeToken}`;
+  }
+  const mailOptions = {
+    from: CONFIG.EMAIL_USER,
+    to,
+    subject: `Subscription to ${repo} activated successfully!`,
+    html: template,
+  };
+
+  await transporter.sendMail(mailOptions);
+}
+
 export const sendActivationEmail = async (to: string, token: string, repo: string) => {
   let template: string;
   try {

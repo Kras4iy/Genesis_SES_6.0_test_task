@@ -1,4 +1,4 @@
-import Fastify, { FastifyInstance } from 'fastify'
+import Fastify, { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
 import subscribeValidation, { validateEmail } from './utils/subscribeValidation';
 import { SubscribeData } from './types';
 import subscribeUser from './utils/subscribeUser';
@@ -20,7 +20,19 @@ server.addContentTypeParser('application/json', { parseAs: 'string' }, (req, bod
   }
 });
 
-server.post('/subscribe', async (request, reply) => {
+const apiKeyAuth = async (request: FastifyRequest, reply: FastifyReply) => {
+  if (CONFIG.API_USE_AUTH) {
+    const header = request.headers.authorization;
+    const token = header && String(header).startsWith('token ')
+      ? String(header).split(' ')[1]
+      : header && String(header);
+    if (!token || token !== CONFIG.API_KEY) {
+      reply.code(401).send({ message: 'Invalid or missing API key' });
+    }
+  }
+};
+
+server.post('/subscribe', { preHandler: apiKeyAuth }, async (request, reply) => {
   try {
     const body = request.body as string;
     const url = new URLSearchParams(body);
@@ -46,7 +58,7 @@ server.post('/subscribe', async (request, reply) => {
   }
 });
 
-server.get('/unsubscribe/:token', async (request, reply) => {
+server.get('/unsubscribe/:token', { preHandler: apiKeyAuth }, async (request, reply) => {
   try {
     const { token } = request.params as { token?: string };
     if (token) {
@@ -64,7 +76,7 @@ server.get('/unsubscribe/:token', async (request, reply) => {
   }
 })
 
-server.get('/subscriptions', async (request, reply) => {
+server.get('/subscriptions', { preHandler: apiKeyAuth }, async (request, reply) => {
   try {
     const { email } = request.query as { email?: string };
     if (!email || !validateEmail(email).valid) {
@@ -81,7 +93,7 @@ server.get('/subscriptions', async (request, reply) => {
   }
 })
 
-server.get('/confirm/:token', async (request, reply) => {
+server.get('/confirm/:token', { preHandler: apiKeyAuth }, async (request, reply) => {
   try {
     const { token } = request.params as { token?: string };
     if (token) {

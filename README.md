@@ -29,6 +29,19 @@ If an error occurs during notification sending, it will be retried on the next s
 
 6. **Authentication**: You can enable API authentication using the `API_USE_AUTH` and `API_KEY` environment variables. When authentication is enabled, all requests must include an `Authorization` header with the following format: `token {your_token}`.
 
+### 7. Prometheus Metrics
+
+The project supports Prometheus metrics. You can access all default metrics using the `/metrics` endpoint. Additionally, the following custom metrics have been added:
+
+- `sent_subscribe_request_total`: Tracks the total number of subscription requests sent.
+- `confirmed_subscriptions_total`: Tracks the total number of confirmed subscriptions.
+- `deactivated_subscriptions_total`: Tracks the total number of deactivated subscriptions.
+- `email_sent_total`: Tracks the total number of emails sent.
+- `github_api_errors_total`: Tracks the total number of GitHub API errors encountered.
+- `http_request_duration_seconds`: Measures the duration of HTTP requests in seconds.
+- `http_requests_total`: Tracks the total number of HTTP requests.
+- `http_requests_in_progress`: Tracks the number of HTTP requests currently in progress.
+
 # Prerequisites
 - Node.js 18+ / 20+
 - pnpm

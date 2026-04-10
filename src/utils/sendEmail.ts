@@ -2,6 +2,7 @@ import nodemailer from 'nodemailer';
 import { CONFIG } from "../config";
 import fs from 'fs';
 import path from 'path';
+import { emailsSentTotal } from '../promMetrics';
 
 let transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -10,6 +11,12 @@ let transporter = nodemailer.createTransport({
     pass: CONFIG.EMAIL_PASS,
   },
 });
+
+const sendMail: typeof transporter.sendMail = async (mailOptions) => {
+  const result = await transporter.sendMail(mailOptions);
+  emailsSentTotal.inc();
+  return result;
+}
 
 const getTemplate = (templateName: string, variables: Record<string, string>): string => {
   const templatePath = path.join(__dirname, '..', '..', 'emailTemplates', `${templateName}.html`);
@@ -37,7 +44,7 @@ export const sendSuccessActivationEmail = async (to: string, repo: string, unsub
     html: template,
   };
 
-  await transporter.sendMail(mailOptions);
+  await sendMail(mailOptions);
 }
 
 export const sendActivationEmail = async (to: string, token: string, repo: string) => {
@@ -58,7 +65,7 @@ export const sendActivationEmail = async (to: string, token: string, repo: strin
     html: template,
   };
 
-  await transporter.sendMail(mailOptions);
+  await sendMail(mailOptions);
 }
 
 export const sendNotificationEmail = async (to: string, repo: string, unsubscribeToken: string) => {
@@ -80,6 +87,6 @@ export const sendNotificationEmail = async (to: string, repo: string, unsubscrib
     html: template,
   };
 
-  await transporter.sendMail(mailOptions);
+  await sendMail(mailOptions);
 }
 

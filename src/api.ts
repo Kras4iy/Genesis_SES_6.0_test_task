@@ -1,4 +1,5 @@
 import { CONFIG } from "./config";
+import { githubApiErrorsTotal } from "./promMetrics";
 import { getRepoLastRelease } from "./utils/getRepoLastRelease";
 import ThrowErrorCode from "./utils/throwErrorCode";
 
@@ -11,6 +12,7 @@ export const ghGetRepoReleasesInfo = async (repo: string): Promise<string | unde
     const response = await fetch(`https://api.github.com/repos/${repo}/releases`, { headers });
     const data = await response.json();
     if (!response.ok) {
+      githubApiErrorsTotal.labels(String(response.status)).inc();
       if (data.message === 'Not Found' && response.status === 404) {
         throw new ThrowErrorCode(404, `Repository ${repo} not found`);
       }

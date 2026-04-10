@@ -8,6 +8,7 @@ import activateSubscription from './utils/activateSubscription';
 import startScanner from './utils/scanner';
 import deactivateSubscription from './utils/deactivateSubscription';
 import getAllUserSubscription from './utils/getAllUserSubscription';
+import { confirmedSubscriptionsTotal, deactivatedSubscriptionsTotal, httpRequestDuration, httpRequestsInProgress, httpRequestsTotal, register, sentSubscribeRequestTotal } from './promMetrics';
 
 const server: FastifyInstance = Fastify({})
 
@@ -32,6 +33,25 @@ const apiKeyAuth = async (request: FastifyRequest, reply: FastifyReply) => {
   }
 };
 
+server.addHook('onRequest', async (request: FastifyRequest, reply: FastifyReply) => {
+  (request as any)._metricsStart = process.hrtime();
+  const route = (request as any).routerPath || request.url || 'unknown';
+  httpRequestsInProgress.labels(request.method, route).inc();
+});
+
+server.addHook('onResponse', async (request: FastifyRequest, reply: FastifyReply) => {
+  const start = (request as any)._metricsStart as [number, number] | undefined;
+  const route = (request as any).routerPath || request.url || 'unknown';
+  const status = String(reply.statusCode || 0);
+  if (start) {
+    const diff = process.hrtime(start);
+    const seconds = diff[0] + diff[1] / 1e9;
+    httpRequestDuration.labels(request.method, route, status).observe(seconds);
+  }
+  httpRequestsTotal.labels(request.method, route, status).inc();
+  httpRequestsInProgress.labels(request.method, route).dec();
+});
+
 server.post('/subscribe', { preHandler: apiKeyAuth }, async (request, reply) => {
   try {
     const body = request.body as string;
@@ -47,7 +67,7 @@ server.post('/subscribe', { preHandler: apiKeyAuth }, async (request, reply) => 
     }
 
     await subscribeUser(data as SubscribeData);
-
+    sentSubscribeRequestTotal.inc();
     return reply.code(200).send('Subscription successful. Confirmation email sent');
   } catch (err) {
     if (err instanceof ThrowErrorCode) {
@@ -63,6 +83,7 @@ server.get('/unsubscribe/:token', { preHandler: apiKeyAuth }, async (request, re
     const { token } = request.params as { token?: string };
     if (token) {
       await deactivateSubscription(token);
+      deactivatedSubscriptionsTotal.inc();
     } else {
       throw new ThrowErrorCode(400, 'Token is required');
     }
@@ -98,6 +119,7 @@ server.get('/confirm/:token', { preHandler: apiKeyAuth }, async (request, reply)
     const { token } = request.params as { token?: string };
     if (token) {
       await activateSubscription(token);
+      confirmedSubscriptionsTotal.inc();
     } else {
       throw new ThrowErrorCode(400, 'Token is required');
     }
@@ -110,6 +132,11 @@ server.get('/confirm/:token', { preHandler: apiKeyAuth }, async (request, reply)
     return reply.code(500).send({ message: 'Internal Server Error' });
   }
 })
+
+server.get('/metrics', { preHandler: apiKeyAuth }, async (request, reply) => {
+  reply.header('Content-Type', register.contentType);
+  return register.metrics();
+});
 
 const start = async () => {
   try {
